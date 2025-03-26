@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"strconv"
 
 	"github.com/01-edu/z01"
 )
@@ -12,29 +11,30 @@ func main() {
 		return
 	}
 
-	n, err := strconv.Atoi(os.Args[1])
-	if err != nil || n == 0 {
+	number, err := Atoi(os.Args[1])
+	if !err || number <= 1{
 		return
 	}
 
-	factors := PrimeFactor(n)
-	if len(factors) == 0 {
-		return
+	factors := Primefactor(number)
+
+	fprimeStr := ""
+
+	for i, n := range factors {
+		if i < len(factors) - 1 {
+			fprimeStr += Itoa(n) + "*"
+		} else {
+			fprimeStr += Itoa(n)
+		}
 	}
 
-	for i, factor := range factors {
-		for _, num := range Itoa(factor) {
-			z01.PrintRune(num)
-		}
-		if i < len(factors) -1 {
-			z01.PrintRune('*')
-		}
+	for _, c := range fprimeStr {
+		z01.PrintRune(c)
 	}
 	z01.PrintRune('\n')
 }
 
-
-func PrimeFactor(n int) []int {
+func Primefactor(n int) []int {
 	factors := []int{}
 	for i := 2; i <= n; i++ {
 		for n%i == 0 {
@@ -45,6 +45,23 @@ func PrimeFactor(n int) []int {
 	return factors
 }
 
+func Atoi(s string) (int, bool) {
+	sign := 1
+	number := 0
+
+	for i, c := range s {
+		if i == 0 && c == '-' {
+			sign = -1
+		} else if i == 0 && c == '+' {
+			sign = 1
+		} else if c >= '0' && c <= '9' {
+			number = number * 10 + int(c - '0')
+		} else {
+			return 0, false
+		}
+	}
+	return (sign * number), true
+}
 
 func Itoa(n int) string {
 	sign := ""
@@ -58,10 +75,10 @@ func Itoa(n int) string {
 		return "0"
 	}
 
-	var digits []rune
+	digits := []rune{}
 
 	for n > 0 {
-		digit := n%10
+		digit := n % 10
 		digits = append([]rune{rune('0' + digit)}, digits...)
 		n /= 10
 	}
